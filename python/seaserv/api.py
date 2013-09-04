@@ -43,8 +43,8 @@ class SeafileAPI(object):
         return seafserv_rpc.get_decrypt_key(repo_id, username)
 
     # repo manipulation
-    def create_repo(self, name, desc, username, passwd):
-        return seafserv_threaded_rpc.create_repo(name, desc, username, passwd)
+    def create_repo(self, name, desc, username, magic, random_key, enc_version):
+        return seafserv_threaded_rpc.create_repo(name, desc, username, magic, random_key, enc_version)
 
     def get_repo(self, repo_id):
         return seafserv_threaded_rpc.get_repo(repo_id)

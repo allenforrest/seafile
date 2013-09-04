@@ -223,7 +223,7 @@ static void start_rpc_service (CcnetClient *client, int cloud_mode)
     searpc_server_register_function ("seafserv-threaded-rpcserver",
                                      seafile_create_repo,
                                      "seafile_create_repo",
-                                     searpc_signature_string__string_string_string_string());
+                                     searpc_signature_string__string_string_string_string_string_int());
 
     searpc_server_register_function ("seafserv-threaded-rpcserver",
                                      seafile_get_commit,
@@ -540,7 +540,7 @@ static void start_rpc_service (CcnetClient *client, int cloud_mode)
         searpc_server_register_function ("seafserv-threaded-rpcserver",
                                          seafile_create_org_repo,
                                          "seafile_create_org_repo",
-            searpc_signature_string__string_string_string_string_int());
+            searpc_signature_string__string_string_string_string_string_int_int());
 
         searpc_server_register_function ("seafserv-threaded-rpcserver",
                                          seafile_get_org_id_by_repo_id,

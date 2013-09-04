@@ -15,6 +15,7 @@
 #define DEC_FAILURE 0
 
 #define KEYGEN_ITERATION 1 << 19
+#define KEYGEN_ITERATION2 1000
 /* truly random sequece read from /dev/urandom. */
 static unsigned char salt[8] = { 0xda, 0x90, 0x45, 0xc3, 0x06, 0xc7, 0xcc, 0x26 };
 
@@ -32,7 +33,17 @@ int
 seafile_generate_enc_key (const char *data_in, int in_len, int version,
                           unsigned char *key, unsigned char *iv)
 {
-    if (version >= 1)
+    if (version == 2) {
+        PKCS5_PBKDF2_HMAC_SHA1 (data_in, in_len,
+                                salt, sizeof(salt),
+                                KEYGEN_ITERATION2,
+                                32, key);
+        PKCS5_PBKDF2_HMAC_SHA1 ((char *)key, 32,
+                                salt, sizeof(salt),
+                                10,
+                                32, iv);
+        return 0;
+    } else if (version == 1)
         return EVP_BytesToKey (EVP_aes_128_cbc(), /* cipher mode */
                                EVP_sha1(),        /* message digest */
                                salt,              /* salt */
@@ -75,7 +86,13 @@ seafile_encrypt (char **data_out,
     /* Prepare CTX for encryption. */
     EVP_CIPHER_CTX_init (&ctx);
 
-    if (crypt->version >= 1)
+    if (crypt->version == 2)
+        ret = EVP_EncryptInit_ex (&ctx,
+                                  EVP_aes_256_cbc(), /* cipher mode */
+                                  NULL, /* engine, NULL for default */
+                                  crypt->key,  /* derived key */
+                                  crypt->iv);  /* initial vector */
+    else if (crypt->version == 1)
         ret = EVP_EncryptInit_ex (&ctx,
                                   EVP_aes_128_cbc(), /* cipher mode */
                                   NULL, /* engine, NULL for default */
@@ -179,7 +196,13 @@ seafile_decrypt (char **data_out,
     /* Prepare CTX for decryption. */
     EVP_CIPHER_CTX_init (&ctx);
 
-    if (crypt->version >= 1)
+    if (crypt->version == 2)
+        ret = EVP_DecryptInit_ex (&ctx,
+                                  EVP_aes_256_cbc(), /* cipher mode */
+                                  NULL, /* engine, NULL for default */
+                                  crypt->key,  /* derived key */
+                                  crypt->iv);  /* initial vector */
+    else if (crypt->version == 1)
         ret = EVP_DecryptInit_ex (&ctx,
                                   EVP_aes_128_cbc(), /* cipher mode */
                                   NULL, /* engine, NULL for default */
@@ -257,7 +280,13 @@ seafile_decrypt_init (EVP_CIPHER_CTX *ctx,
     /* Prepare CTX for decryption. */
     EVP_CIPHER_CTX_init (ctx);
 
-    if (version >= 1)
+    if (version == 2)
+        ret = EVP_DecryptInit_ex (ctx,
+                                  EVP_aes_256_cbc(), /* cipher mode */
+                                  NULL, /* engine, NULL for default */
+                                  key,  /* derived key */
+                                  iv);  /* initial vector */
+    else if (version == 1)
         ret = EVP_DecryptInit_ex (ctx,
                                   EVP_aes_128_cbc(), /* cipher mode */
                                   NULL, /* engine, NULL for default */

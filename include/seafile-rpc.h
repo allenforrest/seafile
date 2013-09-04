@@ -210,6 +210,8 @@ seafile_clone (const char *repo_id,
                const char *peer_addr,
                const char *peer_port,
                const char *email,
+               const char *random_key,
+               int enc_version,
                GError **error);
 
 char *
@@ -223,6 +225,8 @@ seafile_download (const char *repo_id,
                   const char *peer_addr,
                   const char *peer_port,
                   const char *email,
+                  const char *random_key,
+                  int enc_version,
                   GError **error);
 
 int
@@ -712,14 +716,18 @@ char *
 seafile_create_repo (const char *repo_name,
                      const char *repo_desc,
                      const char *owner_email,
-                     const char *passwd,
+                     const char *magic,
+                     const char *random_key,
+                     int enc_version,
                      GError **error);
 
 char *
 seafile_create_org_repo (const char *repo_name,
                          const char *repo_desc,
                          const char *user,
-                         const char *passwd,
+                         const char *magic,
+                         const char *random_key,
+                         int enc_version,
                          int org_id,
                          GError **error);
 
